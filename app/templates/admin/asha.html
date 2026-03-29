@@ -1,0 +1,120 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}ASHA Workers Overview{% endblock %}
+
+{% block content %}
+<div class="page-actions">
+    <button class="btn btn-primary" onclick="loadAshaData()">Refresh Data</button>
+</div>
+
+<!-- ASHA Workers Table -->
+<div class="table-card">
+    <h3 class="table-title">ASHA Workers Performance</h3>
+    <div class="table-responsive">
+        <table class="data-table" id="asha-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Area</th>
+                    <th>District</th>
+                    <th>Phone</th>
+                    <th>Assigned Mothers</th>
+                    <th>Total Assessments</th>
+                    <th>High Risk Detected</th>
+                    <th>Performance</th>
+                </tr>
+            </thead>
+            <tbody id="asha-table-body">
+                <tr>
+                    <td colspan="8" class="text-center">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Performance Legend -->
+<div class="legend-card">
+    <h4>Performance Indicators</h4>
+    <div class="legend-items">
+        <div class="legend-item">
+            <span class="badge badge-success">Good</span>
+            <span>2+ assessments per mother</span>
+        </div>
+        <div class="legend-item">
+            <span class="badge badge-warning">Moderate</span>
+            <span>1+ assessments per mother</span>
+        </div>
+        <div class="legend-item">
+            <span class="badge badge-danger">Needs Attention</span>
+            <span>Less than 1 assessment per mother</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let ashaData = [];
+
+// Load ASHA data
+async function loadAshaData() {
+    try {
+        const response = await fetch('/admin/asha');
+        ashaData = await response.json();
+        
+        renderAshaTable();
+        updateTimestamp();
+        
+    } catch (error) {
+        console.error('Failed to load ASHA data:', error);
+        showAlert('Failed to load ASHA data', 'error');
+    }
+}
+
+// Render ASHA table
+function renderAshaTable() {
+    const tbody = document.getElementById('asha-table-body');
+    
+    if (ashaData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No ASHA workers registered</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = ashaData.map(asha => {
+        const performanceBadge = getPerformanceBadge(asha.performance);
+        
+        return `
+            <tr>
+                <td><strong>${asha.name}</strong></td>
+                <td>${asha.area}</td>
+                <td>${asha.district}</td>
+                <td>${asha.phone}</td>
+                <td class="text-center">${asha.assigned_mothers_count}</td>
+                <td class="text-center">${asha.total_assessments}</td>
+                <td class="text-center">
+                    <span class="badge badge-danger">${asha.high_risk_detected}</span>
+                </td>
+                <td>${performanceBadge}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Get performance badge
+function getPerformanceBadge(performance) {
+    const badgeMap = {
+        'Good': '<span class="badge badge-success">Good</span>',
+        'Moderate': '<span class="badge badge-warning">Moderate</span>',
+        'Needs Attention': '<span class="badge badge-danger">Needs Attention</span>',
+        'No Assignments': '<span class="badge badge-secondary">No Assignments</span>'
+    };
+    return badgeMap[performance] || '<span class="badge badge-secondary">Unknown</span>';
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadAshaData();
+});
+</script>
+{% endblock %}

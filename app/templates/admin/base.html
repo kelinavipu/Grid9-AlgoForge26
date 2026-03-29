@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MatruRaksha Admin{% endblock %}</title>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>MatruRaksha</h2>
+                <p class="subtitle">Admin Panel</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('admin_dashboard.dashboard') }}" class="nav-item {% if request.endpoint == 'admin_dashboard.dashboard' %}active{% endif %}">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('admin_dashboard.mothers') }}" class="nav-item {% if request.endpoint == 'admin_dashboard.mothers' %}active{% endif %}">
+                    <span class="nav-icon">👩</span>
+                    <span class="nav-text">Mothers</span>
+                </a>
+                <a href="{{ url_for('admin_dashboard.asha') }}" class="nav-item {% if request.endpoint == 'admin_dashboard.asha' %}active{% endif %}">
+                    <span class="nav-icon">👩‍⚕️</span>
+                    <span class="nav-text">ASHA Workers</span>
+                </a>
+                <a href="{{ url_for('admin_dashboard.doctors') }}" class="nav-item {% if request.endpoint == 'admin_dashboard.doctors' %}active{% endif %}">
+                    <span class="nav-icon">👨‍⚕️</span>
+                    <span class="nav-text">Doctors</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <h4>System Status</h4>
+                    <div class="status-item">
+                        <span class="status-label">AI Advisory:</span>
+                        <span class="status-value status-active">Active</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Telegram Bot:</span>
+                        <span class="status-value status-active">Active</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Database:</span>
+                        <span class="status-value status-active">Connected</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>{% block page_title %}Admin Dashboard{% endblock %}</h1>
+                <div class="header-actions">
+                    <span class="timestamp">Last updated: <span id="last-update">--</span></span>
+                </div>
+            </header>
+            
+            <!-- Alert Container -->
+            <div id="alert-container"></div>
+            
+            <!-- Page Content -->
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

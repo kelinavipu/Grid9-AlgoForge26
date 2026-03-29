@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block page_title %}Doctor Portal{% endblock %} - MatruRaksha</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>MatruRaksha</h2>
+                <p>Doctor Portal</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('doctor_dashboard.dashboard', doctor_id=doctor_id) }}" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('doctor_dashboard.mothers', doctor_id=doctor_id) }}" class="nav-item">
+                    <span class="nav-icon">👩</span>
+                    <span class="nav-text">My Patients</span>
+                </a>
+                <a href="{{ url_for('doctor_dashboard.ai_assistant', doctor_id=doctor_id) }}" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Assistant</span>
+                </a>
+                <a href="{{ url_for('doctor_dashboard.message', doctor_id=doctor_id) }}" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">Send Message</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <h4>System Status</h4>
+                    <div class="status-item">
+                        <span>Name:</span>
+                        <span id="doctor-name-display">{{ doctor_name if doctor_name else 'Unknown' }}</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Doctor ID:</span>
+                        <span id="doctor-id-display">{{ doctor_id[:8] if doctor_id else 'Not Set' }}...</span>
+                    </div>
+                    <div class="status-item">
+                        <span>AI Support:</span>
+                        <span class="status-active">Active</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1>{% block page_header %}Doctor Portal{% endblock %}</h1>
+                <div class="top-bar-actions">
+                    <span class="timestamp">Last updated: <span id="last-updated">--</span></span>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                {% block content %}{% endblock %}
+                
+                <!-- Footer Notice -->
+                <div style="margin-top: 3rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; text-align: center; border-top: 3px solid #667eea;">
+                    <p style="margin: 0; color: #495057; font-size: 0.95rem; font-weight: 500;">
+                        💡 AI is assistive. Final decisions are made by healthcare professionals.
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+    <script>
+        // Global variables
+        const DOCTOR_ID = "{{ doctor_id }}";
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,98 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Doctors Overview{% endblock %}
+
+{% block content %}
+<div class="page-actions">
+    <button class="btn btn-primary" onclick="loadDoctorsData()">Refresh Data</button>
+</div>
+
+<!-- Doctors Table -->
+<div class="table-card">
+    <h3 class="table-title">Registered Doctors</h3>
+    <div class="table-responsive">
+        <table class="data-table" id="doctors-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Specialization</th>
+                    <th>Hospital</th>
+                    <th>Phone</th>
+                    <th>Assigned Mothers</th>
+                    <th>Pending Reviews</th>
+                    <th>Avg Response Time</th>
+                </tr>
+            </thead>
+            <tbody id="doctors-table-body">
+                <tr>
+                    <td colspan="7" class="text-center">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Info Card -->
+<div class="info-card">
+    <h4>About Pending Reviews</h4>
+    <p>Pending reviews represent assessments flagged for doctor attention that have not yet been reviewed. High-risk and critical cases are automatically flagged for doctor review.</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let doctorsData = [];
+
+// Load doctors data
+async function loadDoctorsData() {
+    try {
+        const response = await fetch('/admin/doctors');
+        doctorsData = await response.json();
+        
+        renderDoctorsTable();
+        updateTimestamp();
+        
+    } catch (error) {
+        console.error('Failed to load doctors data:', error);
+        showAlert('Failed to load doctors data', 'error');
+    }
+}
+
+// Render doctors table
+function renderDoctorsTable() {
+    const tbody = document.getElementById('doctors-table-body');
+    
+    if (doctorsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No doctors registered</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = doctorsData.map(doctor => {
+        const pendingBadge = doctor.pending_reviews > 0 
+            ? `<span class="badge badge-warning">${doctor.pending_reviews}</span>`
+            : `<span class="badge badge-success">0</span>`;
+        
+        const avgResponseTime = doctor.avg_response_time > 0 
+            ? `${doctor.avg_response_time}h`
+            : 'N/A';
+        
+        return `
+            <tr>
+                <td><strong>${doctor.name}</strong></td>
+                <td>${doctor.specialization}</td>
+                <td>${doctor.hospital}</td>
+                <td>${doctor.phone}</td>
+                <td class="text-center">${doctor.assigned_mothers}</td>
+                <td class="text-center">${pendingBadge}</td>
+                <td class="text-center">${avgResponseTime}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadDoctorsData();
+});
+</script>
+{% endblock %}
